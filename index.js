@@ -2,35 +2,56 @@ const say = require("say");
 const { exec } = require("child_process");
 const ips = require("./ips.json");
 
+require('dotenv').config()
+
+const {
+  ALLOWED_CONSECUTIVE_MISSED_PINGS = 10,
+  GREETING_QUEUE_PROCESSING_TIMEOUT_IN_MS = 100
+} = process.env;
+
+const greetingQueue = [];
+
 const handlePinging = ({
   ip,
-  name,
-  greeting = "Welcome to the network, {{NAME}}",
-  allowedConsecutiveTimeouts = 2
+  greeting,
+  allowedConsecutiveMissedPings = ALLOWED_CONSECUTIVE_MISSED_PINGS
 }) => {
   const pinger = exec(`ping -t ${ip}`);
 
   let isHere = false;
-  let numConsecutiveTimeouts = 0;
+  let numConsecutiveMissedPings = 0;
   pinger.stdout.on("data", (d) => {
     const message = d.toString().trim();
-    console.log(`${ip} ${message}`)
+    console.log(`[${ip}] ${message}`)
 
     // misc output that we don't care about
     if (["Request","Reply"].every(m => !message.includes(m))) return;
 
     if (message.indexOf(ip) == -1) {
-      numConsecutiveTimeouts++;
-      if (numConsecutiveTimeouts > allowedConsecutiveTimeouts) isHere = false;
+      numConsecutiveMissedPings++;
+      if (numConsecutiveMissedPings > allowedConsecutiveMissedPings) {
+        console.log(`[${ip}] has left the building`)
+        isHere = false
+      };
       return;
     }
-    numConsecutiveTimeouts = 0;
+    numConsecutiveMissedPings = 0;
     if (isHere) return;
     isHere = true;
 
-    speakQueue.push(greeting.replace("{{NAME}}", name));
+    greetingQueue.push(greeting);
   });
 }
 
 ips.forEach(handlePinging);
 
+(() => {
+  let isGreeting = false;
+  const processor = () => {
+    setTimeout(processor, GREETING_QUEUE_PROCESSING_TIMEOUT_IN_MS);
+    if (isGreeting || !greetingQueue.length) return;
+
+    say.speak(greetingQueue.shift())
+  }
+  processor();
+})();
