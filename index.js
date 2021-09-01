@@ -1,8 +1,9 @@
+require('dotenv').config()
+
 const say = require("say");
 const { exec } = require("child_process");
 const ips = require("./ips.json");
-
-require('dotenv').config()
+const logger = require("./logger")
 
 const {
   ALLOWED_CONSECUTIVE_MISSED_PINGS = 10,
@@ -22,15 +23,15 @@ const handlePinging = ({
   let numConsecutiveMissedPings = 0;
   pinger.stdout.on("data", (d) => {
     const message = d.toString().trim();
-    console.log(`[${ip}] ${message}`)
+    logger.trace(`[${ip}] ${message}`)
 
     // misc output that we don't care about
     if (["Request","Reply"].every(m => !message.includes(m))) return;
 
     if (message.indexOf(ip) == -1) {
       numConsecutiveMissedPings++;
-      if (numConsecutiveMissedPings > allowedConsecutiveMissedPings) {
-        console.log(`[${ip}] has left the building`)
+      if (isHere && numConsecutiveMissedPings > allowedConsecutiveMissedPings) {
+        logger.info(`[${ip}] has missed ${numConsecutiveMissedPings} consecutive pings`)
         isHere = false
       };
       return;
