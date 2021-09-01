@@ -51,6 +51,7 @@ ips.forEach(handlePinging);
     setTimeout(processor, GREETING_QUEUE_PROCESSING_TIMEOUT_IN_MS);
     if (isGreeting || !greetingQueue.length) return;
 
+    isGreeting = true;
     say.speak(greetingQueue.shift(), undefined, undefined, () => isGreeting = false)
   }
   processor();
