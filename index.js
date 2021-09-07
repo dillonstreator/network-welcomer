@@ -40,7 +40,7 @@ const handlePinging = (params) => {
       numConsecutiveMissedPings = 0;
       if (isHere) return;
       isHere = true;
-  
+
       greetingQueue.push(greeting);
     });
     const retry = () => doPing({ ip, greeting, allowedConsecutiveMissedPings })

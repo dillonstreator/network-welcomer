@@ -7,10 +7,10 @@ if (typeof logLevel !== 'number' || (logLevel > 5 || logLevel < 0)) {
 }
 
 module.exports = {
-    trace: (...args) => logLevel <= 0 && console.log(`[TRACE] `, ...args),
-    debug: (...args) => logLevel <= 1 && console.log(`[DEBUG] `, ...args),
-    info: (...args) => logLevel <= 2 && console.log(`[INFO] `, ...args),
-    warn: (...args) => logLevel <= 3 && console.log(`[WARN] `, ...args),
-    error: (...args) => logLevel <= 4 && console.log(`[ERROR] `, ...args),
-    critical: (...args) => logLevel <= 5 && console.log(`[CRITICAL] `, ...args),
+    trace: (...args) => logLevel <= 0 && console.log(`[TRACE]`, ...args),
+    debug: (...args) => logLevel <= 1 && console.log(`[DEBUG]`, ...args),
+    info: (...args) => logLevel <= 2 && console.log(`[INFO]`, ...args),
+    warn: (...args) => logLevel <= 3 && console.log(`[WARN]`, ...args),
+    error: (...args) => logLevel <= 4 && console.log(`[ERROR]`, ...args),
+    critical: (...args) => logLevel <= 5 && console.log(`[CRITICAL]`, ...args),
 }
